@@ -269,6 +269,13 @@ func (r *ReconcilePostgres) shouldDropDB(cr *dbv1alpha1.Postgres, logger logr.Lo
 		return true
 	}
 
+	users := dbv1alpha1.PostgresUserList{}
+	r.client.List(context.TODO(), &users, &client.ListOptions{})
+	logger.Info("OULALALALALALA")
+	for _, user := range users.Items {
+		logger.Info(fmt.Sprintf("%v", user))
+	}
+
 	for _, db := range dbs.Items {
 		// Skip database if it's the same as the one we're deleting
 		if db.Name == cr.Name && db.Namespace == cr.Namespace {
