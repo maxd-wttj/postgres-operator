@@ -62,11 +62,12 @@ require (
 	go.uber.org/atomic v1.6.0 // indirect
 	go.uber.org/multierr v1.5.0 // indirect
 	go.uber.org/zap v1.14.1 // indirect
-	golang.org/x/crypto v0.0.0-20200414173820-0848c9571904 // indirect
-	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45 // indirect
-	golang.org/x/sys v0.0.0-20220405052023-b1e9470b6e64 // indirect
-	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.0.1 // indirect
