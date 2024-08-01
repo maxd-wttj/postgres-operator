@@ -115,7 +115,8 @@ func (r *ReconcilePostgres) Reconcile(request reconcile.Request) (_ reconcile.Re
 
 	// deletion logic
 	if !instance.GetDeletionTimestamp().IsZero() {
-		if r.shouldDropDB(instance, reqLogger) && instance.Status.Succeeded {
+		suspendDBDeletion := r.hasRelatedUsers(instance, reqLogger)
+		if !suspendDBDeletion && r.shouldDropDB(instance, reqLogger) && instance.Status.Succeeded {
 			if instance.Status.Roles.Owner != "" {
 				err := r.pg.DropRole(instance.Status.Roles.Owner, r.pg.GetUser(), instance.Spec.Database, reqLogger)
 				if err != nil {
@@ -142,7 +143,9 @@ func (r *ReconcilePostgres) Reconcile(request reconcile.Request) (_ reconcile.Re
 				return reconcile.Result{}, err
 			}
 		}
-		instance.SetFinalizers(nil)
+		if !suspendDBDeletion {
+			instance.SetFinalizers(nil)
+		}
 
 		return reconcile.Result{}, nil
 	}
@@ -290,4 +293,26 @@ func (r *ReconcilePostgres) shouldDropDB(cr *dbv1alpha1.Postgres, logger logr.Lo
 	}
 
 	return true
+}
+
+func (r *ReconcilePostgres) hasRelatedUsers(cr *dbv1alpha1.Postgres, logger logr.Logger) bool {
+
+	// Get a list of all PostgresUsers
+	users := dbv1alpha1.PostgresUserList{}
+	err := r.client.List(context.TODO(), &users, &client.ListOptions{})
+	if err != nil {
+		logger.Info(fmt.Sprintf("%v", err))
+		// If there is an error, we'd rather claim that there are depending users.
+		return true
+	}
+
+	for _, user := range users.Items {
+		if user.Spec.Database == cr.Name {
+			logger.Info("Found user for DB, not dropping yet")
+			logger.Info(fmt.Sprintf("%v", user.Spec.Database))
+			return true
+		}
+	}
+
+	return false
 }
